@@ -27,7 +27,14 @@ android {
     }
 }
 
+repositories {
+    maven {
+        url  "https://dl.bintray.com/posit/posit-android-sdk"
+    }
+}
+
 dependencies {
+    implementation 'tech.posit.android:posit:0.1.0'
     implementation 'com.google.android.exoplayer:exoplayer:2.10.0'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
