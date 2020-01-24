@@ -13,8 +13,7 @@ Posit allows video publisher platforms to gain insights about their videos by le
 The library will provided as a AAR package. Import the provided module using project structure in android studio and include the following dependencies using Gradle
 
 ```
-    implementation project(path: ':posit')
-
+implementation project(path: ':posit')
 ```   
 
 To ensure successful compilation, add the following lines in the build.gradle file under app module 
