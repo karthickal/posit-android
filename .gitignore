@@ -1,4 +1,6 @@
-posit-debug
-posit-release
+posit-debug/
+posit-release/
+.idea/
+local.properties
 .app/
 .gradle/

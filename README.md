@@ -20,8 +20,7 @@ repositories {
         url  "https://dl.bintray.com/posit/posit-android-sdk" 
     }
 }
-```   
-```   
+```     
 
 To ensure successful compilation, add the following lines in the build.gradle file under app module 
 
