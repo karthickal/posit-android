@@ -155,5 +155,5 @@ data class Product(
 )
 ```
 
-That’s it! All your videos are now tracked for apparel objects. You can enable/disable annotations for certain videos from your developer dashboard.
+That’s it! All your videos are now tracked for apparel objects. You can enable/disable annotations for certain videos from your developer dashboard in the future.
   
