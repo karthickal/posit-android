@@ -30,20 +30,6 @@ android.useAndroidX=true
 android.enableJetifier=true
 ```
 
-Ensure Exoplayer, AWS SDK and Jwt dependencies are added in your build.gradle file 
-
-```
-implementation 'com.amazonaws:aws-android-sdk-s3:2.13.+'
-implementation ('com.amazonaws:aws-android-sdk-mobile-client:2.13.+@aar') { transitive = true }
-implementation 'com.google.android.exoplayer:exoplayer:2.10.0'
-
-api 'io.jsonwebtoken:jjwt-api:0.10.5'
-runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.10.5'
-runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.10.5') {
-  exclude group: 'org.json', module: 'json' //provided by Android natively
-}
-```
-
 #### Permissions
 
 The Posit Android SDK needs the following permissions in order to work. Please add the following lines in your AndroidManifest.xml file. This permission allows the app to connect to network services.
@@ -59,9 +45,6 @@ The SDK has to be initialized with your application keys before it can be used. 
 
 ```
 
-import android.app.Application
-import tech.posit.android.Posit
-
 class JpApplication : Application() {
     override fun onCreate() {
         super.onCreate()
@@ -72,7 +55,11 @@ class JpApplication : Application() {
         val secretKey = "ae2b01a8-bd9c-11e9-bb3d-560d0e73f093"
         val apiPath = "https://api.posit.tech/testing/"
 
-        Posit.Manager.build(app, clientId, accessKey, secretKey, apiPath)
+      /** @param context The application context object
+        * @param clientId The ID issued to the VoD Client
+        * @param clientAccessKey The access key issued to the SDK
+        * @param clientSecretKey The secret key issued to the SDK */
+        Posit.init(app, clientId, accessKey, secretKey)
     }
 }
 ```
@@ -88,14 +75,81 @@ app:surface_type="texture_view"
 
 #### Implementation
 
-For the default implementation after creating the Exoplayer instance in your activity, register with Posit like this 
+The posit layer can be enabled for any video view (which extends the exoplayer) by calling the `getProductsInVideo()` method  
+
+For kotlin usage the method is exposed as a extension function on the exolayer instance and can be called as 
+```
+fun PlayerView.getProductsInVideo(
+    clientVideoId: String, // The ID of the video in your database
+    fps: Int, // fps = frames per second of the video
+    resultCallback: Posit.PositCallback // callback for video and products information from posit
+) 
+```
+
+The method can be invoked from java as a static util function as 
+```
+PositUtils.getProductsInVideo(
+    PlayerView playerView, //The current exoplayer instance 
+    String clientVideoId, // The ID of the video in your database
+    Int fps, // fps = frames per second of the video
+    Posit.PositCallback resultCallback // callback for video and products information from posit
+)
+```
+
+#### Posit callback implementation
+
+The posit callback interface  `PositCallback` should be implemented by the client to register for product updates from the Posit library
+```
+ interface PositCallback {
+        /**
+         * This function will be initially invoked during the start of the video.
+         * 
+         * important: The function is not a one shot operation, the flag will be updated at any point in time if required.
+         * @return [isShoppable]: a flag which will inform if the current video is shoppable or not 
+         * */
+        fun onVideoShoppable(isShoppable: Boolean)
+        
+        /**
+         * This function will be invoked when a new products are available in the currently playing frame of the video
+         * @return [product]: list of products on the currently visible frame of the video
+         * */
+        fun onNewProduct(product: List<Product>)
+    }
+}
+``` 
+
+#### One shot operation method
+The above mentioned interface methods are called through out the progress of the video, incase if a one shot operation is required to get all the products use this function
 
 ```
-Posit.register(this, playerView, videoId, fps)
+/**
+     * This function can be used to get all the products that appear in any video (which are already indexed by posit)
+     *
+     * @param [clientVideoId] videoId for which the products should be returned
+     * */
+    fun Posit.getAllProducts(
+        clientVideoId: String
+    ): List<Product> {
+        TODO()
+    }
+```
+    
+The `product` object returned by the `PositCallback` methods and  `getAllProducts()` contains the following details
 ```
 
-videoId = the ID of the video in your database; fps = frames per second of the video
-
+/**
+ * The data class representing product info. 
+ * This is a standard data object which will be returned by the Posit layer for product information
+ * */
+data class Product(
+    val productId: Int, // The product Id as maintained by Posit
+    val name: String, // The general category of the product eg.., shirt, pants
+    val imageUrl: String, //The image url of the product obtained from the market place  
+    val firstAppearance: Int, // Represents the frame of the video at which at the product initially appeared
+    val productUrl: List<String>, // List of urls from where the product can be purchased
+    val price: Int // the average price of the product
+)
+```
 That’s it! All your videos now display information when the user pauses. You can enable/disable annotations for certain videos from your developer dashboard.
 
 
