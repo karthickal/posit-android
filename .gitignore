@@ -4,3 +4,6 @@ posit-release/
 local.properties
 .app/
 .gradle/
+
+posit-android.iml
+posit-android-sdk.iml
