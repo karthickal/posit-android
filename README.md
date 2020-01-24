@@ -75,11 +75,14 @@ app:surface_type="texture_view"
 
 #### Implementation
 
-The posit layer can be enabled for any video view (which extends the exoplayer) by calling the `getProductsInVideo()` method  
+##### Register Video
 
-For kotlin usage the method is exposed as a extension function on the exolayer instance and can be called as 
+To make a video shoppable it has to be registered with Posit first. The `scanVideo()` method accepts a callback and scans the target video for objects. 
+
+To register, on Kotlin
+
 ```
-fun PlayerView.getProductsInVideo(
+fun PlayerView.scanVideo(
     clientVideoId: String, // The ID of the video in your database
     fps: Int, // fps = frames per second of the video
     resultCallback: Posit.PositCallback // callback for video and products information from posit
@@ -88,7 +91,7 @@ fun PlayerView.getProductsInVideo(
 
 The method can be invoked from java as a static util function as 
 ```
-PositUtils.getProductsInVideo(
+PositUtils.scanVideo(
     PlayerView playerView, //The current exoplayer instance 
     String clientVideoId, // The ID of the video in your database
     Int fps, // fps = frames per second of the video
@@ -96,9 +99,16 @@ PositUtils.getProductsInVideo(
 )
 ```
 
-#### Posit callback implementation
+The Posit SDK enables the following functionalities - 
 
-The posit callback interface  `PositCallback` should be implemented by the client to register for product updates from the Posit library
+* Get notifed when an apparel object is detected in the frame during video playback
+* Get notified when a shoppable video is played
+* Fetch a list of apparel objects in a video 
+
+##### Notification Callbacks
+
+The posit callback interface  `PositCallback` should be implemented by the client to register for product updates from the Posit library. The following functions notify when the user watches a shoppable video and when an object is detected during playback respectively.
+
 ```
  interface PositCallback {
         /**
@@ -118,8 +128,9 @@ The posit callback interface  `PositCallback` should be implemented by the clien
 }
 ``` 
 
-#### One shot operation method
-The above mentioned interface methods are called through out the progress of the video, incase if a one shot operation is required to get all the products use this function
+##### List of products in a video
+
+Use the following method to get a list of all products in a video. Please pass the ID of a video that is registered with Posit.
 
 ```
 /**
@@ -150,8 +161,6 @@ data class Product(
     val price: Int // the average price of the product
 )
 ```
-That’s it! All your videos now display information when the user pauses. You can enable/disable annotations for certain videos from your developer dashboard.
 
-
-
+That’s it! All your videos are now tracked for apparel objects. You can enable/disable annotations for certain videos from your developer dashboard.
   
