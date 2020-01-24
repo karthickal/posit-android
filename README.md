@@ -10,17 +10,11 @@ Posit allows video publisher platforms to gain insights about their videos by le
 ### Installation
 
 #### Dependencies
-
-Include the following dependencies using Gradle
+The library will provided as a AAR package. Import the provided module using project structure in android studio and include the following dependencies using Gradle
 
 ```
-implementation 'tech.posit.android:posit:0.3.0'
+    implementation project(path: ':posit')
 
-repositories {
-    maven {
-        url  "https://dl.bintray.com/posit/posit-android-sdk" 
-    }
-}
 ```   
 
 To ensure successful compilation, add the following lines in the build.gradle file under app module 
