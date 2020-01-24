@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Justplay TV - Posit Demo</string>
+    <string name="welcome">Welcome to Justplay TV</string>
+    <string name="play_button_action">Play Video</string>
+    <string name="posit_default_title">The Title</string>
+    <string name="posit_product_image_alt">An image of the actual product</string>
+</resources>

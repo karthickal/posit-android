@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background_blur_color">#99000000</color>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorBgPrimary">#e0e0e0</color>
+    <color name="colorBg">#475067</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="colorFontPrimary">#FFFFFF</color>
+    <color name="colorFontSubtitle">#B4B5B5</color>
+    <color name="colorMenuBg">#000000</color>
+    <color name="positLogoColor1">#8ed0ce</color>
+    <color name="positLogoColor2">#BA9BD8</color>
+    <color name="colorFontMenuInactive">#a4a4a4</color>
+    <color name="colorBgSolid">#000000</color>
+    <color name="colorBgTransparent">#80000000</color>
+    <color name="colorBgErrorTransparent">#B3000000</color>
+    <color name="colorFontMenuActive">#FFFFFF</color>
+</resources>
