@@ -13,7 +13,7 @@ Posit allows video publisher platforms to gain insights about their videos by le
 Include the following dependencies using Gradle
 
 ```
-implementation 'tech.posit.android:posit:0.1.0'
+implementation 'tech.posit.android:posit:0.1.2'
 
 repositories {
     maven {
