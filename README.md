@@ -9,6 +9,19 @@ Posit allows video publisher platforms to gain insights about their videos by le
 
 ### Installation
 
+### app.gradle 
+add the following lines in your app.gradle (or your main android module gradle) file, in order to avoid the tflite model to be compressed by android 
+
+```
+android {
+...
+    aaptOptions {
+        noCompress "tflite"
+    }
+...
+}
+```
+
 #### Dependencies
 Include the following dependencies using Gradle
 
