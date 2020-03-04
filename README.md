@@ -26,11 +26,11 @@ android {
 Include the following dependencies using Gradle
 
 ```
-implementation 'tech.posit.android:posit:0.1.5'
+implementation 'posit-android-sdk:Posit:0.1.0'
 
 repositories {
     maven {
-        url  "https://dl.bintray.com/posit/posit-android-sdk" 
+        url  "https://posit2.bintray.com/Posit"
     }
 }
 ```     
@@ -142,17 +142,13 @@ The posit callback interface  `PositCallback` should be implemented by the clien
 
 ##### List of products in a video
 
-Use the following method to get a list of all products in a video. Please pass the ID of a video that is registered with Posit.
+Use the following method to get a list of all products in a video(until the current frame).
 
 ```
 /**
-     * This function can be used to get all the products that appear in any video (which are already indexed by posit)
-     *
-     * @param [clientVideoId] videoId for which the products should be returned
+     * This function can be used to get all the products that appear in any video, until the current frame (which are already indexed by posit)
      * */
-    fun Posit.getAllProducts(
-        clientVideoId: String
-    ): List<Product> {
+    fun Posit.getProductsAsync(): Deferred<List<ProductInfo>?> {
         TODO()
     }
 ```
