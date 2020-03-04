@@ -37,6 +37,5 @@ class JpApplication : MultiDexApplication() {
 
         Log.d(LOG_TAG, "Initializing Posit from Justplay")
         Posit.init(app, clientId, accessKey, secretKey)
-
     }
 }

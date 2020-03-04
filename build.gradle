@@ -24,7 +24,7 @@ allprojects {
         google()
         jcenter()
         maven {
-            url  "https://dl.bintray.com/posit/posit-android-sdk"
+            url  "https://posit2.bintray.com/Posit"
         }
     }
 }

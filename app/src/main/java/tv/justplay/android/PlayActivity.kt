@@ -8,6 +8,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.exoplayer2.ExoPlayerFactory
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
@@ -89,6 +90,7 @@ class PlayActivity : AppCompatActivity() {
         Log.d(LOG_TAG, "Registering the player with Posit")
         player_view.scanVideo(
             this.videoId.toString(),
+            "Title",
             fps,
             object : Posit.PositCallback {
                 override fun onVideoShoppable(isShoppable: Boolean) {
@@ -96,10 +98,30 @@ class PlayActivity : AppCompatActivity() {
                 }
 
                 override fun onNewProduct(product: List<Product>) {
-                    Toast.makeText(this@PlayActivity, product[0].name, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@PlayActivity, product[0].brand, Toast.LENGTH_SHORT).show()
                 }
             }
         )
+
+        player!!.addListener(object : Player.EventListener {
+            override fun onPlayerStateChanged(
+                playWhenReady: Boolean,
+                playbackState: Int
+            ) {
+                if (!playWhenReady || playbackState != Player.STATE_READY) {
+                    if (!playWhenReady) {
+                        val productList = Posit.getProductsAsync()
+                        productList.invokeOnCompletion {
+                            android.util.Log.v(
+                                "Products in frame",
+                                productList.getCompleted()?.joinToString { ", " }
+                                    ?: "No Products found")
+                        }
+                    }
+                }
+            }
+        })
+
         if (playbackPosition > 0) {
             player?.seekTo(currentWindow, playbackPosition)
         }
