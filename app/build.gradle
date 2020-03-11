@@ -76,6 +76,6 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
 
-    implementation 'posit-android-sdk:Posit:0.1.4' // add this line
+    implementation 'posit-android-sdk:Posit:0.1.5' // add this line
 
 }
