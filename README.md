@@ -26,7 +26,7 @@ android {
 Include the following dependencies using Gradle
 
 ```
-implementation 'posit-android-sdk:Posit:0.1.5'
+implementation 'posit-android-sdk:Posit:0.1.7'
 
 repositories {
     maven {

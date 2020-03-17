@@ -4,6 +4,7 @@ import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log.v
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -94,7 +95,7 @@ class PlayActivity : AppCompatActivity() {
             fps,
             object : Posit.PositCallback {
                 override fun onVideoShoppable(isShoppable: Boolean) {
-
+                    android.util.Log.v("isVideoShoppable", "$isShoppable")
                 }
 
                 override fun onNewProduct(product: List<Product>) {
