@@ -21,10 +21,6 @@ import tv.justplay.android.UIModel
 
 class ProductRecommendationFragment : DialogFragment() {
 
-    companion object {
-        fun newInstance() = ProductRecommendationFragment()
-    }
-
     private lateinit var viewModel: ProductRecommendationViewModel
 
     override fun onCreateView(

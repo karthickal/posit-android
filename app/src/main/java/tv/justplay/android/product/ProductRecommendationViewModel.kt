@@ -12,7 +12,7 @@ class ProductRecommendationViewModel : ViewModel() {
     val products: LiveData<UIModel<List<ProductInfo>, Exception>> = liveData {
         emit(UIModel.LoadingModel)
 
-        val result = Posit.getProductsAsync().await()
+        val result = Posit.getAllProductsAsync()
         if (result != null) {
             emit(UIModel.SuccessModel(result))
         } else {

@@ -47,7 +47,6 @@ class VideoFragment : Fragment() {
     private var playWhenReady: Boolean = true
 
     private val LOG_TAG = "PlayActivity"
-//    private val ivHideControllerButton: ImageView by lazy { findViewById<ImageView>(R.id.exo_controller) }
 
     private var videoId: String? = null
     private var sourceUrl: String? = null
@@ -86,14 +85,6 @@ class VideoFragment : Fragment() {
             Util.getUserAgent(requireContext(), "Exo2")
         )
 
-//        var sourceUrl = "https://s3.ap-south-1.amazonaws.com/testing.deliver.videos.justplay.tv/titles/aval-anthathi/mobile/output/media.m3u8"
-//        var videoId = 123
-//        var fps = 24
-
-//        var sourceUrl = "https://s3.ap-south-1.amazonaws.com/testing.deliver.videos.justplay.tv/titles/short-films/avalum-naanum/mobile/output/media.m3u8"
-//        var videoId = "a234d213"
-//        var fps = 24
-
         val hlsMediaSource = HlsMediaSource.Factory(mediaDataSourceFactory).createMediaSource(
             Uri.parse(
                 sourceUrl
@@ -118,15 +109,13 @@ class VideoFragment : Fragment() {
         player?.playWhenReady = this.playWhenReady
         player_view?.useController = false
 
-//        ivHideControllerButton.setOnClickListener { playerView.hideController() }
-
         Log.d(LOG_TAG, "Registering the player with Posit")
         player_view.scanVideo(
             this.videoId.toString(),
             title ?: "",
             fps,
             object : Posit.PositCallback {
-                override fun onVideoShoppable(isShoppable: Boolean) {
+                override fun isVideoShoppable(isShoppable: Boolean) {
                     Log.v("Posit", "is video shoppable: $isShoppable")
                 }
 
