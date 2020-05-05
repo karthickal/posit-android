@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="tv.justplay.android.HomeFragment"
+        android:label="home_fragment"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_videoFragment"
+            app:destination="@id/videoFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_newVideoDialogFragment"
+            app:destination="@id/newVideoDialogFragment"
+            app:enterAnim="@android:anim/cycle_interpolator"
+            app:exitAnim="@anim/fragment_close_enter" />
+    </fragment>
+    <fragment
+        android:id="@+id/videoFragment"
+        android:name="tv.justplay.android.VideoFragment"
+        android:label="video_fragment"
+        tools:layout="@layout/fragment_video">
+        <argument
+            android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="fps"
+            android:defaultValue="24"
+            app:argType="integer" />
+        <argument
+            android:name="mpd_url"
+            app:argType="string" />
+        <argument
+            android:name="id"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_videoFragment_to_productRecommendationFragment"
+            app:destination="@id/productRecommendationFragment" />
+    </fragment>
+    <dialog
+        android:id="@+id/newVideoDialogFragment"
+        android:name="tv.justplay.android.NewVideoDialogFragment"
+        android:label="fragment_new_video"
+        tools:layout="@layout/fragment_new_video">
+        <action
+            android:id="@+id/action_newVideoDialogFragment_to_videoFragment"
+            app:destination="@id/videoFragment" />
+    </dialog>
+    <dialog
+        android:id="@+id/productRecommendationFragment"
+        android:name="tv.justplay.android.product.ProductRecommendationFragment"
+        android:label="ProductRecommendationFragment"
+        tools:layout="@layout/product_recommendation_fragment">
+        <action
+            android:id="@+id/action_productRecommendationFragment_to_videoFragment"
+            app:destination="@id/videoFragment" />
+    </dialog>
+</navigation>

@@ -1,14 +1,20 @@
 package tv.justplay.android
 
+import android.animation.Animator
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log.v
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.exoplayer2.ExoPlayerFactory
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.TrackGroupArray
@@ -17,14 +23,17 @@ import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.util.Log
 import com.google.android.exoplayer2.util.Util
-import kotlinx.android.synthetic.main.activity_player.*
+import kotlinx.android.synthetic.main.fragment_video.*
 import tech.posit.android.data.repository.model.Product
 import tech.posit.android.posit.Posit
 import tech.posit.android.utils.scanVideo
+import java.net.CookieHandler
+import java.net.CookieManager
+import java.net.CookiePolicy
 
-class PlayActivity : AppCompatActivity() {
+
+class VideoFragment : Fragment() {
 
     private var player: SimpleExoPlayer? = null
     private lateinit var mediaDataSourceFactory: DataSource.Factory
@@ -45,25 +54,37 @@ class PlayActivity : AppCompatActivity() {
     private var title: String? = null
     private var fps: Int = 24
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_player)
+    private val args: VideoFragmentArgs by navArgs()
 
-        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        supportActionBar?.hide()
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_video, container, false)
+    }
 
-        this.videoId = intent.getStringExtra("id")
-        this.sourceUrl = intent.getStringExtra("mpd_url")
-        this.fps = intent.getIntExtra("fps", 24)
-        this.title = intent.getStringExtra("title")
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        view.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        activity?.actionBar?.hide()
+
+        this.videoId = args.id
+        this.sourceUrl = args.mpdUrl
+        this.fps = args.fps
+        this.title = args.title
+
+        initializePlayer()
     }
 
     private fun initializePlayer() {
 
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-
-        trackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
-        mediaDataSourceFactory = DefaultDataSourceFactory(this, Util.getUserAgent(this, "justplayTV"))
+        trackSelector = DefaultTrackSelector(requireContext(), videoTrackSelectionFactory)
+        mediaDataSourceFactory = DefaultDataSourceFactory(
+            requireContext(),
+            Util.getUserAgent(requireContext(), "Exo2")
+        )
 
 //        var sourceUrl = "https://s3.ap-south-1.amazonaws.com/testing.deliver.videos.justplay.tv/titles/aval-anthathi/mobile/output/media.m3u8"
 //        var videoId = 123
@@ -73,10 +94,21 @@ class PlayActivity : AppCompatActivity() {
 //        var videoId = "a234d213"
 //        var fps = 24
 
-        val hlsMediaSource = HlsMediaSource.Factory(mediaDataSourceFactory).createMediaSource(Uri.parse(sourceUrl))
+        val hlsMediaSource = HlsMediaSource.Factory(mediaDataSourceFactory).createMediaSource(
+            Uri.parse(
+                sourceUrl
+            )
+        )
+
+        if (CookieHandler.getDefault() != DEFAULT_COOKIE_MANAGER) {
+            CookieHandler.setDefault(DEFAULT_COOKIE_MANAGER)
+        }
 
         if ((player == null) and (trackSelector != null)) {
-            player = ExoPlayerFactory.newSimpleInstance(this, trackSelector!!)
+            player = SimpleExoPlayer.Builder(requireContext())
+                .setTrackSelector(trackSelector!!)
+                .build()
+
             player?.prepare(hlsMediaSource, false, false)
         }
 
@@ -91,18 +123,39 @@ class PlayActivity : AppCompatActivity() {
         Log.d(LOG_TAG, "Registering the player with Posit")
         player_view.scanVideo(
             this.videoId.toString(),
-            "Title",
+            title ?: "",
             fps,
             object : Posit.PositCallback {
                 override fun onVideoShoppable(isShoppable: Boolean) {
-                    android.util.Log.v("isVideoShoppable", "$isShoppable")
+                    Log.v("Posit", "is video shoppable: $isShoppable")
                 }
 
                 override fun onNewProduct(product: List<Product>) {
-                    Toast.makeText(this@PlayActivity, product[0].brand, Toast.LENGTH_SHORT).show()
+                    loader_fab.visibility = View.VISIBLE
+                    loader_fab.playAnimation()
+
+                    loader_fab.addAnimatorListener(object : Animator.AnimatorListener {
+                        override fun onAnimationRepeat(animation: Animator?) {}
+
+                        override fun onAnimationEnd(animation: Animator?) {
+                            loader_fab.visibility = View.GONE
+                        }
+
+                        override fun onAnimationCancel(animation: Animator?) {}
+
+                        override fun onAnimationStart(animation: Animator?) {}
+                    })
+                    Log.d("Posit new product", product.joinToString { it.productId })
                 }
             }
         )
+
+
+        if (playbackPosition > 0) {
+            player?.seekTo(currentWindow, playbackPosition)
+        }
+        player_view?.useController = true
+        lastSeenTrackGroupArray = null
 
         player!!.addListener(object : Player.EventListener {
             override fun onPlayerStateChanged(
@@ -111,23 +164,16 @@ class PlayActivity : AppCompatActivity() {
             ) {
                 if (!playWhenReady || playbackState != Player.STATE_READY) {
                     if (!playWhenReady) {
-                        val productList = Posit.getProductsAsync()
-                        productList.invokeOnCompletion {
-                            android.util.Log.v(
-                                "Products in frame",
-                                productList.getCompleted()?.joinToString { ", " }
-                                    ?: "No Products found")
+                        if (findNavController().currentDestination?.id == R.id.videoFragment) {
+                            findNavController().navigate(R.id.action_videoFragment_to_productRecommendationFragment)
                         }
+
+                    } else {
+                        Log.v("event", "event")
                     }
                 }
             }
         })
-
-        if (playbackPosition > 0) {
-            player?.seekTo(currentWindow, playbackPosition)
-        }
-        player_view?.useController = true
-        lastSeenTrackGroupArray = null
     }
 
 
@@ -141,7 +187,6 @@ class PlayActivity : AppCompatActivity() {
             LOG_TAG,
             "Updating position $playbackPosition playready $playWhenReady window $currentWindow"
         )
-
     }
 
     private fun releasePlayer() {
@@ -151,40 +196,47 @@ class PlayActivity : AppCompatActivity() {
         trackSelector = null
     }
 
-    public override fun onStart() {
+    override fun onStart() {
         super.onStart()
-
         Log.d(LOG_TAG, "Activity Started")
-        initializePlayer()
-
         player_view?.onResume()
     }
 
-    public override fun onResume() {
+    override fun onResume() {
         super.onResume()
-
         Log.d(LOG_TAG, "Activity Resumed")
-
-
-//        initializePlayer()
-//        if (Util.SDK_INT <= 23) initializePlayer()
     }
 
-    public override fun onPause() {
+    override fun onPause() {
         super.onPause()
         updateStartPosition()
-
         Log.d(LOG_TAG, "Activity Paused")
-
         if (Util.SDK_INT <= 23) releasePlayer()
     }
 
-    public override fun onStop() {
+    override fun onStop() {
         super.onStop()
 //        updateStartPosition()
         Log.d(LOG_TAG, "Activity Stopped")
-
         if (Util.SDK_INT > 23) releasePlayer()
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    }
+
+    companion object {
+        val DEFAULT_COOKIE_MANAGER = CookieManager()
+    }
+
+    init {
+        DEFAULT_COOKIE_MANAGER.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
+    }
 }
