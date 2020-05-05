@@ -26,7 +26,7 @@ android {
 Include the following dependencies using Gradle
 
 ```
-implementation 'posit-android-sdk:Posit:0.1.7'
+implementation 'posit-android-sdk:Posit:0.2.0'
 
 repositories {
     maven {
@@ -129,7 +129,7 @@ The posit callback interface  `PositCallback` should be implemented by the clien
          * important: The function is not a one shot operation, the flag will be updated at any point in time if required.
          * @return [isShoppable]: a flag which will inform if the current video is shoppable or not 
          * */
-        fun onVideoShoppable(isShoppable: Boolean)
+        fun isVideoShoppable(isShoppable: Boolean)
         
         /**
          * This function will be invoked when a new products are available in the currently playing frame of the video
@@ -148,7 +148,7 @@ Use the following method to get a list of all products in a video(until the curr
 /**
      * This function can be used to get all the products that appear in any video, until the current frame (which are already indexed by posit)
      * */
-    fun Posit.getProductsAsync(): Deferred<List<ProductInfo>?> {
+    suspend fun Posit.getAllProducts(): List<ProductInfo>? {
         TODO()
     }
 ```
