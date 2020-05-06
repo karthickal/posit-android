@@ -93,6 +93,6 @@ dependencies {
     implementation 'com.airbnb.android:lottie:3.4.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
 
-    implementation 'posit-android-sdk:Posit:0.1.9' // add this line
+    implementation 'posit-android-sdk:Posit:0.2' // add this line
 
 }
